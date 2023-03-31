@@ -17,47 +17,53 @@ int count = 0;
 int capacity = INITIAL_TABLE_SIZE;
 // Item *HashTable[INITIAL_TABLE_SIZE] = {NULL};
 
-Item** init_hash_table(){
-    //Item** table = malloc(sizeof(Item) * capacity);
-    Item** table = calloc(capacity, sizeof(Item));
+// Item** init_hash_table(){
+//     //Item** table = malloc(sizeof(Item) * capacity);
+//     Item** table = calloc(capacity, sizeof(Item));
+//     return table;
+// }
+
+Item* init_hashtable(){
+    Item* table = calloc(sizeof(Item), capacity);
     return table;
 }
 
-void insert(Item **HashTable, char key[], int value);
-void resize_table(Item **HashTable);
+void insert(Item *HashTable, char* key, int value);
+void resize_table(Item *HashTable);
 int isPrime(int n);
 int nextPrime(int n);
-int create_hash(char key[]);
+int create_hash(char* key);
 
-Item* createItem(char key[], int value)
-{
-    Item* item = malloc(sizeof(Item));
-    strcpy(item->key, key);
-    item->value = value;
-    return item;
-}
+// Item createItem(char* key, int value)
+// {
+//     Item item = malloc(sizeof(Item));
+//     strcpy(item->key, key);
+//     item->value = value;
+//     return item;
+// }
 
-void insert(Item** HashTable, char key[], int value){
+void insert(Item* HashTable, char* key, int value){
     int hash = create_hash(key);
     int index = hash % capacity;
-    Item *item = createItem(key, value);
-    if(HashTable[index] == NULL){
-        HashTable[index] = item;
+    Item entry = {.key = key, .value = value};
+    // Item *item = createItem(key, value);
+    if((HashTable + index)->key == NULL){
+        HashTable[index] = entry;
         count++;
     }
-    else if(HashTable[index]->key == key){
-        HashTable[index]->value = item->value;
+    else if((HashTable + index)->key == key){
+        (HashTable + index)->value = entry.value;
     }
-    else if(HashTable[index] != NULL){
+    else if((HashTable + index)->key != NULL){
         int found = 0; // begin quadratic probing
         int i = 1;
         while (!found){
-            index = index + (i * i);
-            if(HashTable[index] == NULL){
-                HashTable[index] = item;
+            index = (index + (i * i)) % capacity;
+            if((HashTable + index)->key == NULL){
+                HashTable[index] = entry;
                 count++;
                 found = 1;
-            }
+            }                                  
             i++;
         }
         }
@@ -71,28 +77,30 @@ void insert(Item** HashTable, char key[], int value){
     }
 }
 
-void resize_table(Item** HashTable){
-    Item** items = malloc(sizeof(Item) * count);
+void resize_table(Item* HashTable){
+    //Item* items = malloc(sizeof(Item) * count);
+    Item items[count];
     int newCapacity = nextPrime(capacity * 2);
     int itemsIndex = 0;
+    Item empty = {.key = NULL, .value = 0};
     for (int i = 0; i < capacity; i++)
     {
-        if (HashTable[i] != NULL)
+        if ((HashTable + i)->key != NULL)
         {
             items[itemsIndex] = HashTable[itemsIndex];
-            HashTable[i] = NULL;
+            HashTable[i] = empty;
             itemsIndex++;
         }
     }
     //free(HashTable);
-    HashTable = realloc(HashTable, newCapacity);
+    HashTable = realloc(HashTable, newCapacity * sizeof(Item));
     count = 0;
     capacity = newCapacity;
-    for (int i = 0; i < itemsIndex - 1; i++)
+    for (int i = 0; i < itemsIndex; i++)
     {
-        insert(HashTable, items[i]->key, items[i]->value);
+        insert(HashTable, items[i].key, items[i].value);
     }
-    free(items);
+    //free(items);
 }
 
 int retrieve(Item** HashTable, char* key){
@@ -166,10 +174,11 @@ int create_hash(char key[]){
 
 
 int main(){
-    Item** table = init_hash_table();
+    Item* table = init_hashtable();
     insert(table, "hello", 3);
     insert(table, "hola", 4);
     insert(table, "bonjour", 5);
     insert(table, "ciao", 6);
-    //int returned_key = retrieve(table, "hello");
+    printf("Hello");
+    // int returned_key = retrieve(table, "hello");
 }
