@@ -13,8 +13,14 @@ typedef struct {
     int value;
 }Item;
 
-int count = 0;
-int capacity = INITIAL_TABLE_SIZE;
+typedef struct {
+    Item* table;
+    int count;
+    int capacity;
+} HashTable;
+
+//int count = 0;
+// int capacity = INITIAL_TABLE_SIZE;
 // Item *HashTable[INITIAL_TABLE_SIZE] = {NULL};
 
 // Item** init_hash_table(){
@@ -26,6 +32,10 @@ int capacity = INITIAL_TABLE_SIZE;
 Item* init_hashtable(){
     Item* table = calloc(sizeof(Item), capacity);
     return table;
+}
+
+void free_hashtable(Item* HashTable){
+    free(HashTable);
 }
 
 void insert(Item *HashTable, char* key, int value);
@@ -123,6 +133,7 @@ int retrieve(Item** HashTable, char* key){
 
 
 
+
 int isPrime(int n){
     if(n % 2 == 0 || n % 3 == 0){
         return 0;
@@ -179,6 +190,7 @@ int main(){
     insert(table, "hola", 4);
     insert(table, "bonjour", 5);
     insert(table, "ciao", 6);
+    free_hashtable(table);
     printf("Hello");
     // int returned_key = retrieve(table, "hello");
 }
