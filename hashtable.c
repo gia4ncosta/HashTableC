@@ -1,30 +1,46 @@
 #include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
 
-#define INITIAL_TABLE_SIZE 23
+
+#define INITIAL_TABLE_SIZE 7
 #define MAX_KEY_SIZE 10
 #define MAX_HASH_SIZE 20
 
-struct Item{
-    char key[30];
+typedef struct {
+    char* key;
     int value;
-};
+}Item;
 
 int count = 0;
-int size = INITIAL_TABLE_SIZE;
-struct Item *HashTable[INITIAL_TABLE_SIZE];
+int capacity = INITIAL_TABLE_SIZE;
+// Item *HashTable[INITIAL_TABLE_SIZE] = {NULL};
 
-struct Item* createItem(char key[], int value){
-    //struct Item item = {.key = key, .value = value};
-    struct Item *item = (struct Item *)malloc(sizeof(struct Item));
-    strcpy(item->value, key);
+Item** init_hash_table(){
+    //Item** table = malloc(sizeof(Item) * capacity);
+    Item** table = calloc(capacity, sizeof(Item));
+    return table;
+}
+
+void insert(Item **HashTable, char key[], int value);
+void resize_table(Item **HashTable);
+int isPrime(int n);
+int nextPrime(int n);
+int create_hash(char key[]);
+
+Item* createItem(char key[], int value)
+{
+    Item* item = malloc(sizeof(Item));
+    strcpy(item->key, key);
     item->value = value;
     return item;
 }
 
-void insert(char key[], int value){
+void insert(Item** HashTable, char key[], int value){
     int hash = create_hash(key);
-    int index = hash % (sizeof(HashTable)/sizeof(HashTable[0]));
-    struct Item *item = createItem(key, value);
+    int index = hash % capacity;
+    Item *item = createItem(key, value);
     if(HashTable[index] == NULL){
         HashTable[index] = item;
         count++;
@@ -48,13 +64,56 @@ void insert(char key[], int value){
     else{
         printf("Error inserting into table.");
     }
-
-    if((double)(count / size) > 0.5 ){ //check load factor
-        int const newSize = nextPrime(size * 2);
-        struct Item *ptr = (struct Item *)malloc(size * sizeof(struct Item));
-        //how to?
+    double loadfactor = ((double)count / capacity);
+    if (loadfactor > 0.5)
+    { // check load factor
+        resize_table(HashTable);
     }
 }
+
+void resize_table(Item** HashTable){
+    Item** items = malloc(sizeof(Item) * count);
+    int newCapacity = nextPrime(capacity * 2);
+    int itemsIndex = 0;
+    for (int i = 0; i < capacity; i++)
+    {
+        if (HashTable[i] != NULL)
+        {
+            items[itemsIndex] = HashTable[itemsIndex];
+            HashTable[i] = NULL;
+            itemsIndex++;
+        }
+    }
+    //free(HashTable);
+    HashTable = realloc(HashTable, newCapacity);
+    count = 0;
+    capacity = newCapacity;
+    for (int i = 0; i < itemsIndex - 1; i++)
+    {
+        insert(HashTable, items[i]->key, items[i]->value);
+    }
+    free(items);
+}
+
+int retrieve(Item** HashTable, char* key){
+    int hash = create_hash(key);
+    int index = hash % capacity;
+    int found = 0;
+    int i = 0;
+    Item* curItem = HashTable[index];
+    while (curItem != NULL){
+        //int tableKey = HashTable[index + (i * i)]->key;
+        if (!strcmp(curItem->key, key))
+        {
+            return curItem->value;
+        }
+        ++i;
+        curItem = HashTable[((index + (i * i)) % capacity)];
+    }
+    return -1;
+}
+
+
 
 int isPrime(int n){
     if(n % 2 == 0 || n % 3 == 0){
@@ -94,7 +153,7 @@ int nextPrime(int n){
 
 int create_hash(char key[]){
     int hash = 0;
-    int min = sizeof(key) / sizeof(key[0]);
+    int min = strlen(key) / sizeof(key[0]);
     if(min > 8){
         min = 8;
     }
@@ -107,18 +166,10 @@ int create_hash(char key[]){
 
 
 int main(){
-    // int n;
-    // printf("Enter a number to check prime: \n");
-    // scanf("%d", &n);
-    // //printf("%d",n);
-    // int next = nextPrime(n + 1);
-    // if (isPrime(n))
-    // {
-    //     printf("Your number is prime and the next prime after that is: %d", next);
-    // }
-    // else{
-    //     printf("Your number is not prime but the next prime is: %d", next);
-    // }
-    // return 0; 
+    Item** table = init_hash_table();
+    insert(table, "hello", 3);
+    insert(table, "hola", 4);
+    insert(table, "bonjour", 5);
+    insert(table, "ciao", 6);
+    //int returned_key = retrieve(table, "hello");
 }
-
