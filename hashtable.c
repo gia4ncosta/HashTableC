@@ -5,8 +5,8 @@
 
 
 #define INITIAL_TABLE_SIZE 7
-#define MAX_KEY_SIZE 10
-#define MAX_HASH_SIZE 20
+//#define MAX_KEY_SIZE 10
+//#define MAX_HASH_SIZE 20
 
 typedef struct {
     char* key;
@@ -70,25 +70,33 @@ int create_hash(char* key);
 void insert(HashTable* table, char* key, int value){
     int hash = create_hash(key);
     int index = hash % table->capacity;
-    Item entry = {.key = key, .value = value};
+   // char* allocatedKey = strdup(key);
+    Item entry = {.key = key, .value = value}; // creating entry to be inserted
     // Item *item = createItem(key, value);
-    if((table->tableArray + index)->key == NULL){
+    if((table->tableArray + index)->key == NULL){ //checking if indexed spot is empty
         table->tableArray[index] = entry;
         table->count++;
     }
-    else if((table->tableArray + index)->key == key){
-        (table->tableArray + index)->value = entry.value;
-    }
-    else if((table->tableArray + index)->key != NULL){
-        int found = 0; // begin quadratic probing
-        int i = 1;
-        while (!found){
-            index = (index + (i * i)) % table->capacity;
-            if((table->tableArray + index)->key == NULL){
-                table->tableArray[index] = entry;
+    // else if(!strcmp((table->tableArray + index)->key,key)){
+    //     (table->tableArray + index)->value = entry.value;
+    // }
+    else if((table->tableArray + index)->key != NULL){ //begin quadratic probing
+        //also checks if current entry at index has the same key as the passed key
+        int found = 0; 
+        int i = 0;
+        int newIndex;
+        while (!found)
+        {
+            newIndex = (index + (i * i)) % table->capacity; 
+            if((table->tableArray + newIndex)->key == NULL){ //checking if empty spot has been found
+                table->tableArray[newIndex] = entry;
                 table->count++;
                 found = 1;
-            }                                  
+            }
+            else if(!strcmp((table->tableArray + newIndex)->key,key)){ //checking for same keys
+                (table->tableArray + newIndex)->value = entry.value; //update key's value if duplicate key
+                found = 1;
+            }
             i++;
         }
         }
@@ -96,7 +104,7 @@ void insert(HashTable* table, char* key, int value){
         printf("Error inserting into table.");
     }
     double loadfactor = ((double)table->count / table->capacity);
-    if (loadfactor > 0.5)
+    if (loadfactor > 0.5) //table resize check
     { // check load factor
         resize_table(table);
     }
@@ -104,29 +112,32 @@ void insert(HashTable* table, char* key, int value){
 
 int resize_table(HashTable* table){
     //Item* items = malloc(sizeof(Item) * count);
-    Item items[table->count];
+    Item items[table->count]; //creating array to hold items within current hash table
     int newCapacity = nextPrime(table->capacity * 2);
     int itemsIndex = 0;
-    Item empty = {.key = NULL, .value = 0};
+    Item empty = {.key = NULL, .value = 0}; //creating empty entry for resized hash table
     for (int i = 0; i < table->capacity; i++)
     {
-        if ((table->tableArray + i)->key != NULL)
+        if ((table->tableArray + i)->key != NULL) //extracting items from hash table
         {
-            items[itemsIndex] = table->tableArray[itemsIndex];
-            table->tableArray[i] = empty;
+            items[itemsIndex] = table->tableArray[i]; 
+            //table->tableArray[i] = empty; //resetting spot
             itemsIndex++;
         }
     }
     //free(HashTable);
-    if(!(table->tableArray = realloc(table->tableArray, newCapacity * sizeof(Item)))){
+    if(!(table->tableArray = realloc(table->tableArray, newCapacity * sizeof(Item)))){ //resizing hash table
         printf("Error reallocating Hash Table array memory for resizing");
         free(table->tableArray);
         free(table);
         return -1;
     }
+    for (int i = 0; i < newCapacity; i++){
+        table->tableArray[i] = empty;
+    }
     table->count = 0;
     table->capacity = newCapacity;
-    for (int i = 0; i < itemsIndex; i++)
+    for (int i = 0; i < itemsIndex; i++) //reinserting entries into resized hash table
     {
         insert(table, items[i].key, items[i].value);
     }
@@ -151,6 +162,8 @@ int retrieve(HashTable* table, char* key){
     }
     return -1;
 }
+
+//int get_
 
 int isPrime(int n){
     if(n % 2 == 0 || n % 3 == 0){
@@ -188,7 +201,7 @@ int nextPrime(int n){
     return 0;
 }
 
-int create_hash(char key[]){
+int create_hash(char* key){
     int hash = 0;
     int min = strlen(key) / sizeof(key[0]);
     if(min > 8){
@@ -204,11 +217,17 @@ int create_hash(char key[]){
 
 int main(){
     HashTable* table = init_hashtable();
-    insert(table, "hello", 3);
-    insert(table, "hola", 4);
-    insert(table, "bonjour", 5);
-    insert(table, "ciao", 6);
-    printf("%d",retrieve(table, "hello"));
+    insert(table, "hellosdfsdfsdf", 3);
+    insert(table, "holafsadfasdfsdafds", 4);
+    insert(table, "bonjourfasdfsdfg", 5);
+    insert(table, "ciaofdsafasdfsadf", 6);
+    insert(table, "ciaofasdfsadfsdf", 7);
+    printf("%d",retrieve(table, "hellosdfsdfsdf"));
+    printf("%d",retrieve(table, "holafsadfasdfsdafds"));
+    printf("%d",retrieve(table, "bonjourfasdfsdfg"));
+    printf("%d",retrieve(table, "ciaofdsafasdfsadf"));
+    printf("%d",retrieve(table, "ciaofasdfsadfsdf"));
+
     free_hashtable(table);
     //printf("Hello");
     // int returned_key = retrieve(table, "hello");
