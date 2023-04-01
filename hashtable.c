@@ -5,8 +5,6 @@
 
 
 #define INITIAL_TABLE_SIZE 7
-//#define MAX_KEY_SIZE 10
-//#define MAX_HASH_SIZE 20
 
 typedef struct {
     char* key;
@@ -18,16 +16,6 @@ typedef struct {
     int count;
     int capacity;
 } HashTable;
-
-//int count = 0;
-// int capacity = INITIAL_TABLE_SIZE;
-// Item *HashTable[INITIAL_TABLE_SIZE] = {NULL};
-
-// Item** init_hash_table(){
-//     //Item** table = malloc(sizeof(Item) * capacity);
-//     Item** table = calloc(capacity, sizeof(Item));
-//     return table;
-// }
 
 HashTable* init_hashtable(){
     HashTable *table;
@@ -59,27 +47,16 @@ int isPrime(int n);
 int nextPrime(int n);
 int create_hash(char* key);
 
-// Item createItem(char* key, int value)
-// {
-//     Item item = malloc(sizeof(Item));
-//     strcpy(item->key, key);
-//     item->value = value;
-//     return item;
-// }
 
 void insert(HashTable* table, char* key, int value){
     int hash = create_hash(key);
     int index = hash % table->capacity;
-   // char* allocatedKey = strdup(key);
     Item entry = {.key = key, .value = value}; // creating entry to be inserted
-    // Item *item = createItem(key, value);
     if((table->tableArray + index)->key == NULL){ //checking if indexed spot is empty
         table->tableArray[index] = entry;
         table->count++;
     }
-    // else if(!strcmp((table->tableArray + index)->key,key)){
-    //     (table->tableArray + index)->value = entry.value;
-    // }
+  
     else if((table->tableArray + index)->key != NULL){ //begin quadratic probing
         //also checks if current entry at index has the same key as the passed key
         int found = 0; 
@@ -111,7 +88,6 @@ void insert(HashTable* table, char* key, int value){
 }
 
 int resize_table(HashTable* table){
-    //Item* items = malloc(sizeof(Item) * count);
     Item items[table->count]; //creating array to hold items within current hash table
     int newCapacity = nextPrime(table->capacity * 2);
     int itemsIndex = 0;
@@ -121,7 +97,6 @@ int resize_table(HashTable* table){
         if ((table->tableArray + i)->key != NULL) //extracting items from hash table
         {
             items[itemsIndex] = table->tableArray[i]; 
-            //table->tableArray[i] = empty; //resetting spot
             itemsIndex++;
         }
     }
@@ -152,7 +127,6 @@ int retrieve(HashTable* table, char* key){
     int i = 0;
     Item curItem = table->tableArray[index];
     while (curItem.key != NULL){
-        //int tableKey = HashTable[index + (i * i)]->key;
         if (!strcmp(curItem.key, key))
         {
             return curItem.value;
@@ -217,18 +191,17 @@ int create_hash(char* key){
 
 int main(){
     HashTable* table = init_hashtable();
-    insert(table, "hellosdfsdfsdf", 3);
-    insert(table, "holafsadfasdfsdafds", 4);
-    insert(table, "bonjourfasdfsdfg", 5);
-    insert(table, "ciaofdsafasdfsadf", 6);
-    insert(table, "ciaofasdfsadfsdf", 7);
-    printf("%d",retrieve(table, "hellosdfsdfsdf"));
-    printf("%d",retrieve(table, "holafsadfasdfsdafds"));
-    printf("%d",retrieve(table, "bonjourfasdfsdfg"));
-    printf("%d",retrieve(table, "ciaofdsafasdfsadf"));
-    printf("%d",retrieve(table, "ciaofasdfsadfsdf"));
+    insert(table, "hellosdfsdfsdf", "value 1");
+    insert(table, "holafsadfasdfsdafds", "value 2");
+    insert(table, "bonjourfasdfsdfg", "value 3");
+    insert(table, "ciaofdsafasdfsadf", "value 4");
+    insert(table, "ciaofasdfsadfsdf", "value 5");
+    printf("%d, %s",retrieve(table, "hellosdfsdfsdf"), "\n");
+    printf("%d, %s",retrieve(table, "holafsadfasdfsdafds"), "\n");
+    printf("%d, %s",retrieve(table, "bonjourfasdfsdfg"), "\n");
+    printf("%d, %s",retrieve(table, "ciaofdsafasdfsadf"), "\n");
+    printf("%d, %s",retrieve(table, "ciaofasdfsadfsdf"), "\n");
 
     free_hashtable(table);
-    //printf("Hello");
-    // int returned_key = retrieve(table, "hello");
+
 }
