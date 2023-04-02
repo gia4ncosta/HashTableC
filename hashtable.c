@@ -4,11 +4,7 @@
 #include <string.h>
 
 
-<<<<<<< HEAD
 #define INITIAL_TABLE_SIZE 13 //should be prime number for best performance
-=======
-#define INITIAL_TABLE_SIZE 7
->>>>>>> 83e19287da3c5cdaac2080e679b5a187f0152b87
 
 typedef struct {
     char* key;
@@ -21,7 +17,6 @@ typedef struct {
     int capacity;
 } HashTable;
 
-<<<<<<< HEAD
 HashTable *init_hashtable();
 void free_hashtable(HashTable *table);
 void insert_item(HashTable *table, char *key, void *value);
@@ -32,8 +27,6 @@ int is_prime(int n);
 int next_prime(int n);
 int create_hash(char* key);
 
-=======
->>>>>>> 83e19287da3c5cdaac2080e679b5a187f0152b87
 HashTable* init_hashtable(){
     HashTable *table;
     HashTable* error = NULL;
@@ -58,18 +51,7 @@ void free_hashtable(HashTable* table){
     free(table);
 }
 
-<<<<<<< HEAD
 void insert_item(HashTable* table, char* key, void* value){
-=======
-void insert(HashTable* table, char* key, int value);
-int resize_table(HashTable* table);
-int isPrime(int n);
-int nextPrime(int n);
-int create_hash(char* key);
-
-
-void insert(HashTable* table, char* key, int value){
->>>>>>> 83e19287da3c5cdaac2080e679b5a187f0152b87
     int hash = create_hash(key);
     int index = hash % table->capacity;
     Item entry = {.key = key, .value = value}; // creating entry to be inserted
@@ -108,11 +90,7 @@ void insert(HashTable* table, char* key, int value){
     }
 }
 
-<<<<<<< HEAD
 int resize_table(HashTable* table){ //resizes table if load factor > 0.5 (O(n))
-=======
-int resize_table(HashTable* table){
->>>>>>> 83e19287da3c5cdaac2080e679b5a187f0152b87
     Item items[table->count]; //creating array to hold items within current hash table
     int newCapacity = next_prime(table->capacity * 2); //new capacity should also be prime
     int itemsIndex = 0;
@@ -148,13 +126,8 @@ void* retrieve_value(HashTable* table, char* key){ //retrieves value from hash t
     int index = hash % table->capacity;
     int i = 0;
     Item curItem = table->tableArray[index];
-<<<<<<< HEAD
     while (curItem.key != NULL){ 
         if (!strcmp(curItem.key, key)) //checking if current item's key is the same as passed key
-=======
-    while (curItem.key != NULL){
-        if (!strcmp(curItem.key, key))
->>>>>>> 83e19287da3c5cdaac2080e679b5a187f0152b87
         {
             return curItem.value;
         }
@@ -239,7 +212,6 @@ int create_hash(char* key){ //Uses Horner's rule to create hash
 int main(){
     //tests to test basic functionality
     HashTable* table = init_hashtable();
-<<<<<<< HEAD
     char* strentry = "88";
     int intentry = 88;
     double dentry = 4235.423;
@@ -323,19 +295,3 @@ int main(){
     free_hashtable(table);
 
 }
-=======
-    insert(table, "hellosdfsdfsdf", "value 1");
-    insert(table, "holafsadfasdfsdafds", "value 2");
-    insert(table, "bonjourfasdfsdfg", "value 3");
-    insert(table, "ciaofdsafasdfsadf", "value 4");
-    insert(table, "ciaofasdfsadfsdf", "value 5");
-    printf("%d, %s",retrieve(table, "hellosdfsdfsdf"), "\n");
-    printf("%d, %s",retrieve(table, "holafsadfasdfsdafds"), "\n");
-    printf("%d, %s",retrieve(table, "bonjourfasdfsdfg"), "\n");
-    printf("%d, %s",retrieve(table, "ciaofdsafasdfsadf"), "\n");
-    printf("%d, %s",retrieve(table, "ciaofasdfsadfsdf"), "\n");
-
-    free_hashtable(table);
-
-}
->>>>>>> 83e19287da3c5cdaac2080e679b5a187f0152b87
